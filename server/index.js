@@ -16,8 +16,30 @@ app.use("/houses",require("./routes/houses"));
 app.use("/visiting",require("./routes/visiting"));
 app.use("/users",require("./routes/users"));
 
+var requestTime=function(req,res,next){
+req.requestTime=Date.now()
+next()
+}
+
+app.use(requestTime);
+
+app.use(function(err,req,res,next){
+ res.status(err.status)
+
+console.log('Error status',err.status)
+console.log('Message',err.message)
+
+res.json({
+ status: err.status,
+ message:err.message,
+ stack:err.stack
+ })
+})
+
 app.get("/",(req,res)=>{
-  res.send("Hello");
+var responseText='Requested at: '+ req.requestTime;
+
+res.send(responseText);
 });
 
 app.listen(PORT, function() {
